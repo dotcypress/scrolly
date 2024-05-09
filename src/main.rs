@@ -26,7 +26,7 @@ pub const XTAL_FREQ_HZ: u32 = 12_000_000_u32;
 #[used]
 pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_GENERIC_03H;
 
-#[rtic::app(device = pac, peripherals = true, dispatchers = [SW0_IRQ, SW1_IRQ])]
+#[rtic::app(device = pac, peripherals = true)]
 mod app {
     use super::*;
 
@@ -128,16 +128,17 @@ mod app {
             -1
         };
 
+        let report = MouseReport {
+            buttons: 0,
+            x: 0,
+            y: 0,
+            pan: 0,
+            wheel,
+        };
+
         let mut usb_hid = ctx.shared.usb_hid;
         usb_hid.lock(|hid| {
-            hid.push_input(&MouseReport {
-                buttons: 0,
-                x: 0,
-                y: 0,
-                pan: 0,
-                wheel,
-            })
-            .ok();
+            hid.push_input(&report).ok();
         });
     }
 }
